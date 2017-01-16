@@ -10,13 +10,13 @@ A basic static move generator using the STAX algorithm.
 * Generate possible places to play (not through a letter): STARMAP
     * Places next to each letter
     * This is the step that needs the most optimization
-* Check if you can play in each play for each word for each direction
+* Check if you can play ibutn each play for each word for each direction
     * The directions are across and down
     * This part should be optimized too
 * Then use SLOTIFY to get the rest done
     * Go through each row & column, called a "slot"
     * Turn all of the special tiles into empty spaces, represented by `'.'`
-    * Using the GAC again, but this time without the "valid word" filter
+    * Using the GAC again,  this time without the "valid word" filter
     * Put all GAC-ed combinations infront of every letter
     * Check
     
@@ -56,6 +56,12 @@ An example STAX session might look like this, with starting rack `'ASW'` and sta
      |15|TWS|   |   |DLS|   |   |   |TWS|   |   |   |DLS|   |   |TWS|
      ----------------------------------------------------------------
 
+     Rack: A, S, W
+     
+     GAC...
+     Done.
+     
+     STARMAP...
      AW (9, 7) done 1
      AW (7, 7) done 1
      AW (8, 8) done 1
@@ -89,6 +95,8 @@ An example STAX session might look like this, with starting rack `'ASW'` and sta
      WAS (9, 9) done 7
      WAS (7, 9) done 7
      WAS (8, 10) done 8
+     Done.
+     SLOTIFY...
      ...............
      ...............
      ...............
@@ -311,3 +319,4 @@ An example STAX session might look like this, with starting rack `'ASW'` and sta
      ...............
      ...............
      ...............
+     Done.
