@@ -6,6 +6,32 @@ import time
 leaves = open("leaves.txt").read().split()
 leavesDict = {leaves[i]:float(leaves[i+1]) for i in range(0, len(leaves), 2)}
 leavesDict[''] = 0
+diphths = [["".join(i) for i in itertools.permutations(list(string.ascii_uppercase), 2)] + \
+                                        [j*2 for j in string.ascii_uppercase]][0]
+subdicts = {diphth: set(open("resources/" + diphth + ".txt").read().split()) \
+                         for diphth in diphths}
+revsubdicts = {diphth: set(open("resources/rev" + diphth + ".txt").read().split()) \
+                         for diphth in diphths}
+vsd = set(i for i in diphths if len(subdicts[i])>0)
+ved = set(''.join(j for j in reversed(i)) for i in diphths if len(revsubdicts[i]) > 0)
+
+regBoard=[[" ", "A ", "B ", "C ", "D ", "E ", "F ", "G ", "H ", "I ", "J ", "K ", "L ", "M ", "N ", "O "],
+                      ['01', 'TWS', ' ', ' ', 'DLS', ' ', ' ', ' ', 'TWS', ' ', ' ', ' ', 'DLS', ' ', ' ', 'TWS'],
+                      ['02', ' ', 'DWS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'DWS', ' '],
+                      ['03', ' ', ' ', 'DWS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', ' ', ' ', ' ', 'DWS', ' ', ' '],
+                      ['04', 'DLS', ' ', ' ', 'DWS', ' ', ' ', ' ', 'DLS', ' ', ' ', ' ', 'DWS', ' ', ' ', 'DLS'],
+                      ['05', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' '],
+                      ['06', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'B', ' ', ' ', ' ', 'TLS', ' '],
+                      ['07', ' ', ' ', 'DLS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', 'A', ' ', ' ', 'DLS', ' ', ' '],
+                      ['08', 'TWS', ' ', ' ', 'DLS', ' ', ' ', 'B', 'A', 'G', 'S', ' ', 'DLS', ' ', ' ', 'TWS'],
+                      ['09', ' ', ' ', 'DLS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', 'E', ' ', ' ', 'DLS', ' ', ' '],
+                      ['10', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' '],
+                      ['11', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' '],
+                      ['12', 'DLS', ' ', ' ', 'DWS', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', 'DLS'],
+                      ['13', ' ', ' ', 'DWS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', ' ', ' ', ' ', 'DWS', ' ', ' '],
+                      ['14', ' ', 'DWS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'DWS', ' '],
+                      ['15', 'TWS', ' ', ' ', 'DLS', ' ', ' ', ' ', 'TWS', ' ', ' ', ' ', 'DLS', ' ', ' ', 'TWS']]
+
 
 class Move():
     def __init__(self, word, board, row, column, direction, prevBoard, \
@@ -37,28 +63,10 @@ class Move():
 class Board():
     def __init__(self, board=None):
         if board is None:
-            self.board = [[" ", "A ", "B ", "C ", "D ", "E ", "F ", "G ", "H ", "I ", "J ", "K ", "L ", "M ", "N ", "O "],
-                      ['01', 'TWS', ' ', ' ', 'DLS', ' ', ' ', ' ', 'TWS', ' ', ' ', ' ', 'DLS', ' ', ' ', 'TWS'],
-                      ['02', ' ', 'DWS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'DWS', ' '],
-                      ['03', ' ', ' ', 'DWS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', ' ', ' ', ' ', 'DWS', ' ', ' '],
-                      ['04', 'DLS', ' ', ' ', 'DWS', ' ', ' ', ' ', 'DLS', ' ', ' ', ' ', 'DWS', ' ', ' ', 'DLS'],
-                      ['05', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' '],
-                      ['06', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'TLS', ' '],
-                      ['07', ' ', ' ', 'DLS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', ' ', ' ', ' ', 'DLS', ' ', ' '],
-                      ['08', 'TWS', ' ', ' ', 'DLS', ' ', ' ', 'B', 'A', 'G', ' ', ' ', 'DLS', ' ', ' ', 'TWS'],
-                      ['09', ' ', ' ', 'DLS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', ' ', ' ', ' ', 'DLS', ' ', ' '],
-                      ['10', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' '],
-                      ['11', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', ' ', ' '],
-                      ['12', 'DLS', ' ', ' ', 'DWS', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'DWS', ' ', ' ', 'DLS'],
-                      ['13', ' ', ' ', 'DWS', ' ', ' ', ' ', 'DLS', ' ', 'DLS', ' ', ' ', ' ', 'DWS', ' ', ' '],
-                      ['14', ' ', 'DWS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'TLS', ' ', ' ', ' ', 'DWS', ' '],
-                      ['15', 'TWS', ' ', ' ', 'DLS', ' ', ' ', ' ', 'TWS', ' ', ' ', ' ', 'DLS', ' ', ' ', 'TWS']]
-
+            self.board = regBoard
         else:
             self.board = board
-        self.subdicts = {diphth: set(open("resources/" + diphth + ".txt").read().split()) \
-                         for diphth in [["".join(i) for i in itertools.permutations(list(string.ascii_uppercase), 2)] + \
-                                        [j*2 for j in string.ascii_uppercase]][0]}
+        self.subdicts = subdicts
         self.extraList = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", \
          "TWS", "DWS", "TLS", "DLS", \
          "A ", "B ", "C ", "D ", "E ", "F ", "G ", "H ", "I ", "J ", "K ", "L ", "M ", "N ", "O ", \
@@ -121,7 +129,8 @@ class Board():
 
         return words
 
-    def expandFrom(self, point, places, extendedFrom):
+    
+    def expandFrom(self, point, places, extendedFrom, ):
         assert point not in extendedFrom
         
         usedPlaces = [point]
@@ -179,14 +188,15 @@ class Board():
         usedPlaces = self.expandFrom(top, places, extendedFrom)
         l = [coord for place in places for coord in place]
         #Extend to the edge of the board
-        #for i in range(min(l), max(l)+1):
-        for j in range(15):
+        for j in range(min(l), max(l)+1):
             np = usedPlaces[:]
             for i in np:
                 try:
                     usedPlaces.extend(self.expandFrom(i, places, extendedFrom))
                     usedPlaces = self.removeDuplicates(usedPlaces)
                     extendedFrom.append(i)
+                    if sorted(usedPlaces) == sorted(places):
+                        return True
                 except AssertionError:
                     pass
                 
@@ -248,6 +258,7 @@ class Board():
 
         for word in newWords:
             if ''.join(letter[0] for letter in word.keys()) != move.word: #fix for same auxillary words
+                #print(word, move.word)
                 auxWordScore = 0
                 auxWordMult = 1
                 for (letter, place) in word.items():
@@ -258,7 +269,7 @@ class Board():
                     if oldLetter in ['TLS', 'DLS']:
                         lettMult *= ['D', 'T'].index(oldLetter[0])+2
                     elif oldLetter in ['TWS', 'DWS']:
-                        auwWordMult *= ['D', 'T'].index(oldLetter[0])+2
+                        auxWordMult *= ['D', 'T'].index(oldLetter[0])+2
                     auxWordScore += self.scores[letter.lower()] * lettMult
                 auxWordScore *= auxWordMult
                 wordScore += auxWordScore
@@ -346,29 +357,29 @@ class CPU():
                     newBoard = self.rNab()
                     if self.playWord(word, rIndex, cIndex, direc, newBoard):
                         play = Move(word, newBoard, rIndex, cIndex, direc, prevBoard)
-                        play.getScore()
-                        play.getEvaluation(self.rack)
+                        #play.getScore()
+                        #play.getEvaluation(self.rack)
                         plays.append(play)
                         continue
                         
                     newBoard = self.rNab()
                     if self.playWordOpp(word, rIndex, cIndex, direc, newBoard):
                         play = Move(word, newBoard, rIndex, cIndex, direc, prevBoard, revWordWhenScoring=False)
-                        play.getScore()
-                        play.getEvaluation(self.rack)
+                        #play.getScore()
+                        #play.getEvaluation(self.rack)
                         plays.append(play)
-                print(word, neighbor, "done", len(plays))
+                #print(word, neighbor, "done", len(plays))
 
         for (d, row) in enumerate(self.board.board[1:]):
             for play in self.complete(self.slotify(row[1:]), 'A', d+1):
-                play.getScore()
-                play.getEvaluation(self.rack)
+                #play.getScore()
+                #play.getEvaluation(self.rack)
                 plays.append(play)
         columns = [[row[i] for row in self.board.board[1:]] for i in range(len(self.board.board))]
         for (d, col) in enumerate(columns):
             for play in self.complete(self.slotify(col), 'D', d):
-                play.getScore()
-                play.getEvaluation(self.rack)
+                #play.getScore()
+                #play.getEvaluation(self.rack)
                 plays.append(play)               
         return plays
 
@@ -390,17 +401,24 @@ class CPU():
             return True
         return False
 
-    def playWordOpp(self, word, row, col, direc, board):
-        for letter in word:
+    def playWordOpp(self, word, row, col, direc, board, skip=False):
+        i = 0
+        #for letter in word:
+        while i < len(word):
             if row>15 or col>15:
                 return False
             if board.board[row][col] in string.ascii_uppercase:
-                return False
-            board.board[row][col] = letter
+                if skip:
+                    i -= 1
+                else:
+                    return False
+            else:
+                board.board[row][col] = word[i]
             if direc=='A':
                 col += 1
             else:
                 row += 1
+            i += 1
         if board.checkBoard(board.board):
             return True
         return False
@@ -424,30 +442,31 @@ class CPU():
         if depth == 0:
             return False
         slot, reps = slot
-        if pos + len(word) > len(slot):
-            return False
-        if slot == '...............':
+        if pos + len(word) >= len(slot):
             return False
         currPos = pos
         newSlot = list(slot)
 
         index = 0
-        while index < len(word):
+        while index < len(word)-1:
             newPos = currPos + index
             if newSlot[newPos] != '.':
                 currPos += 1
                 index -= 1
             else:
                 newSlot[newPos] = word[index]
-                try: wordPos
-                except: wordPos = currPos + index
+                if 'wordPos'  not in dir():
+                    wordPos = currPos + index
             index += 1
-        try: wordPos += 1
-        except: return False
+        if 'wordPos' in dir():
+            wordPos += 1
+        else:
+            return False
+        #print(wordPos == slot.index(slot.strip('.')[0]))
         newSlot = ''.join(letter for letter in newSlot)
         if not all(self.checkWord(i) for i in newSlot.strip('.').split('.') if i != ''):
             return False
-        print(newSlot)
+        
         newBoardSlot = []
         for (index, newLetter) in enumerate(newSlot):
             if newLetter == '.':
@@ -467,8 +486,10 @@ class CPU():
 
             row = wordPos
         move = Move(word, newBoard, row, col, direc, oldBoard, doNotScoreWord=True)
-        return move
-    
+        if move.board.checkBoard(move.board.board):
+            return move
+        return False
+        
     def complete(self, slot, direc, depth):
         words = self.board.removeDuplicates(self.gac(self.rack, 7))
         newSlots = []
@@ -476,9 +497,17 @@ class CPU():
         if slotForLen != '...............':
             edgeFinder = [i[0] for i in enumerate(slotForLen) if i[1] !='.']
             for word in words:
-                for pos in range(edgeFinder[0], edgeFinder[-1]+len(word)+2):
+                for pos in range(edgeFinder[0], edgeFinder[-1]+len(word)+1):
                     if pos-len(word) in range(len(slotForLen)):
                         if slotForLen[pos-len(word)] == '.':
+##                            if direc == 'A':
+##                                r, c = depth, slotForLen.index(slotForLen.strip('.')[0])
+##                            else:
+##                                r, c = slotForLen.index(slotForLen.strip('.')[0]), depth
+##                            newBoard = self.rNab()
+##                            if self.playWordOpp(word, r, c, direc, newBoard, skip=True):
+##                                #self.displayBoard(newBoard.board)
+##                                newSlots.append(Move(word, newBoard, r, c, direc, self.rNab(), doNotScoreWord=True))
                             newSlot = self.place(slot, pos-len(word), word, direc, depth)
                             if newSlot:
                                 newSlots.append(newSlot)
@@ -490,14 +519,40 @@ class CPU():
         slot = slot.replace(' ', '.')
         for i in self.extraList:
             slot = slot.replace(i, '.')
-        print(slot)
+        #print(slot)
         return slot, slotForReps
+
+    #Theoretical optimization functions
+    def asw(self, word):
+        if word[:2] in vsd:
+            return True
+        return False
     
-c = CPU([i for i in 'ASW'])
-for i in c.takeTurn():
-    c.displayBoard(i.board.board)
-    print(i.score, i.valuation)
-    print(i.row, i.col)
-    print(i.board.board[i.row])
-    print(i.board.board[i.row][i.col])
-    print(i.dnsw, i.rwws)
+    def aew(self, word):
+        if word[-2:] in ved:
+            return True
+        return False
+    
+c = CPU([i for i in 'AWS'])
+c.displayBoard(c.board.board)
+h = time.time()
+d=c.takeTurn()
+print(time.time()-h)
+for i in d:
+    pass
+ #   c.displayBoard(i.board.board)
+##for i in c.takeTurn():
+##    c.displayBoard(i.board.board)
+##    #print(i.score, i.valuation)
+##    #print(i.row, i.col)
+##    #print(i.board.board[i.row])
+##    #print(i.board.board[i.row][i.col])
+##    #print(i.dnsw, i.rwws)
+'''            try: newSlot[newPos]
+            except:
+                print(pos)
+                print(word)
+                print(slot)
+                print(currPos, index)
+                print(pos+len(word), len(slot))
+                print(newSlot, len(newSlot))'''
