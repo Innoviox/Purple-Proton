@@ -718,9 +718,17 @@ class CPU():
         if move.rwws:
             return reversed(sk)
         return sk
+
+    def exchange(self):
+        exchs = self.gac(self.rack, len(self.rack))
+        for i in exchs:
+            exch = Move(i, self.board, 0, 0, 0, self.board)
+            exch.score = 0
+            exch.getEvaluation(self.rack)
+            yield exch
+        
 c = CPU()
 while distribution:
-#for i in range(1):
     c.displayBoard(c.board.board)
     print(c.rack)
     q=0
@@ -733,25 +741,32 @@ while distribution:
     print(q/1)
     b = Move(0, 0, 0, 0, 0, 0)
     b.score, b.valuation = 0, 0
+    t='p'
     for i in d:
         if i:
             i.getScore()
             i.getEvaluation(c.rack)
             if i.score+i.valuation>b.score+b.valuation:
                 b=i
-    c.displayBoard(b.board.board)
-    wordWithSkips = list(b.word)
-    for i in c.skips(b):
-        for k,v in i.items():
-            wordWithSkips.insert(v, '({})'.format(k))
+    for i in c.exchange():
+        if i.valuation > b.score+b.valuation:
+            b=i
+            t='e'
+    if t != 'e':
+        c.displayBoard(b.board.board)
+        wordWithSkips = list(b.word)
+        for i in c.skips(b):
+            for k,v in i.items():
+                wordWithSkips.insert(v, '({})'.format(k))
 
-    s = ''.join(i for i in wordWithSkips).replace(')(', '')
-    print(s)
-    print([i for i in c.skips(b)])
-    print(b.row, b.col)
-    print(b.score, b.valuation)
-    b.prevBoard.trulySpelledScore(b)
-    c.board = b.board
+        s = ''.join(i for i in wordWithSkips).replace(')(', '')
+        print(s)
+        print([i for i in c.skips(b)])
+        print(b.row, b.col)
+        print(b.score, b.valuation)
+        c.board = b.board
+    else:
+        print('Exchanging: {}\nValuation: {}'.format(b.word, b.valuation))
     for i in b.word:
         try:
             c.rack.remove(i)
