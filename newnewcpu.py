@@ -676,7 +676,7 @@ class CPU():
         if slotForLen != '...............':
             edgeFinder = [i[0] for i in enumerate(slotForLen) if i[1] !='.']
             for word in words:
-                for pos in range(edgeFinder[0]+1, edgeFinder[-1]+len(word)+1):
+                for pos in range(edgeFinder[0], edgeFinder[-1]+len(word)+2):
                     if pos-len(word) in range(len(slotForLen)):
                         if slotForLen[pos-len(word)] == '.':
                             yield self.place(slot, pos-len(word), word, direc, depth)
@@ -691,7 +691,33 @@ class CPU():
             slot = slot.replace(i, '.')
         #print(slot)
         return slot, slotForReps
-    
+
+    def skips(self, move):
+        sk=[]
+        r, c = move.row, move.col
+        i=0
+        while move.board.board[r][c] not in self.extraList:
+            if move.board.board[r][c] == move.prevBoard.board[r][c]:
+                sk.append({move.board.board[r][c]: i})
+            else:
+                i += 1
+            if not move.rwws:
+                im = 1
+            else:
+                im = -1
+
+            if move.direction == 'D':
+                r -= im
+            else:
+                c -= im
+
+            if r > 15 or c > 15:
+                if move.rwws:
+                    return reversed(sk)
+                return sk
+        if move.rwws:
+            return reversed(sk)
+        return sk
 c = CPU()
 while distribution:
 #for i in range(1):
@@ -714,7 +740,14 @@ while distribution:
             if i.score+i.valuation>b.score+b.valuation:
                 b=i
     c.displayBoard(b.board.board)
-    print(b.word)
+    wordWithSkips = list(b.word)
+    for i in c.skips(b):
+        for k,v in i.items():
+            wordWithSkips.insert(v, '({})'.format(k))
+
+    s = ''.join(i for i in wordWithSkips).replace(')(', '')
+    print(s)
+    print([i for i in c.skips(b)])
     print(b.row, b.col)
     print(b.score, b.valuation)
     b.prevBoard.trulySpelledScore(b)
